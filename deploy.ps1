@@ -38,17 +38,20 @@ Write-Host ""
 Write-Host "✅ Git repository prepared!" -ForegroundColor Green
 Write-Host ""
 Write-Host "🔗 Next steps:" -ForegroundColor Cyan
-Write-Host "1. Create a new repository on GitHub named 'adhd-learning-hub'" -ForegroundColor White
-Write-Host "2. Copy and run these commands to add the remote:" -ForegroundColor White
-Write-Host "   git remote add origin https://github.com/YOUR_USERNAME/adhd-learning-hub.git" -ForegroundColor Gray
-Write-Host "3. Push to GitHub:" -ForegroundColor White
+Write-Host "1. Choose your repo name (becomes your free domain: REPO-NAME.pages.dev)" -ForegroundColor White
+Write-Host "   Good options: adhd-hub, focus-hub, adhd-learning, YOUR_IGN-adhd" -ForegroundColor Gray
+Write-Host "2. Create a new repository on GitHub with your chosen name" -ForegroundColor White
+Write-Host "3. Copy and run these commands to add the remote:" -ForegroundColor White
+Write-Host "   git remote add origin https://github.com/YOUR_USERNAME/YOUR-REPO-NAME.git" -ForegroundColor Gray
+Write-Host "4. Push to GitHub:" -ForegroundColor White
 Write-Host "   git branch -M main" -ForegroundColor Gray
 Write-Host "   git push -u origin main" -ForegroundColor Gray
 Write-Host ""
-Write-Host "4. Cloudflare Pages Setup:" -ForegroundColor Cyan
+Write-Host "5. Cloudflare Pages Setup:" -ForegroundColor Cyan
 Write-Host "   - Go to https://dash.cloudflare.com" -ForegroundColor White
 Write-Host "   - Navigate to Pages → Create a project" -ForegroundColor White
 Write-Host "   - Connect to Git → Select your repository" -ForegroundColor White
+Write-Host "   - Project name: Use same as repo name (becomes YOUR-REPO.pages.dev)" -ForegroundColor White
 Write-Host "   - Build settings:" -ForegroundColor White
 Write-Host "     Framework: Astro" -ForegroundColor Gray
 Write-Host "     Build command: npm run build" -ForegroundColor Gray

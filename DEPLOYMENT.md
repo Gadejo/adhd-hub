@@ -27,18 +27,27 @@ The project is configured as follows:
    cd "C:\Users\corin\Documents\b\ADHD learning app\adhd-hub"
    ```
 
-2. **Add Git remote** (if not already done):
+2. **Choose your repository name** (this becomes your free domain!):
+   Your GitHub repo name will become: `https://REPO-NAME.pages.dev`
+   
+   **Recommended names:**
+   - `adhd-hub` → `adhd-hub.pages.dev`
+   - `focus-hub` → `focus-hub.pages.dev`
+   - `adhd-learning` → `adhd-learning.pages.dev`
+   - `YOUR_IGN-adhd` → `your-ign-adhd.pages.dev`
+
+3. **Add Git remote**:
    ```bash
-   git remote add origin https://github.com/YOUR_USERNAME/adhd-learning-hub.git
+   git remote add origin https://github.com/YOUR_USERNAME/YOUR-CHOSEN-NAME.git
    ```
 
-3. **Stage and commit all files**:
+4. **Stage and commit all files**:
    ```bash
    git add .
    git commit -m "Initial commit - ADHD Learning Hub ready for deployment"
    ```
 
-4. **Push to GitHub**:
+5. **Push to GitHub**:
    ```bash
    git branch -M main
    git push -u origin main
@@ -58,8 +67,9 @@ The project is configured as follows:
    - Choose "GitHub" and authorize Cloudflare
 
 3. **Configure Repository**:
-   - Select your `adhd-learning-hub` repository
+   - Select your repository (the name you chose)
    - Choose the `main` branch
+   - **Important**: The project name in Cloudflare should match your repo name
 
 4. **Build Settings**:
    ```
@@ -93,13 +103,13 @@ The project is configured as follows:
 
 3. **Create Pages project**:
    ```bash
-   wrangler pages project create adhd-learning-hub
+   wrangler pages project create YOUR-REPO-NAME
    ```
 
 4. **Deploy**:
    ```bash
    npm run build
-   wrangler pages publish dist --project-name adhd-learning-hub
+   wrangler pages publish dist --project-name YOUR-REPO-NAME
    ```
 
 ### Step 3: Custom Domain Setup (Optional)
@@ -217,9 +227,11 @@ wrangler pages project list
 
 ## Project URLs
 After deployment, your application will be available at:
-- **Primary URL**: `https://adhd-learning-hub.pages.dev`
+- **Primary URL**: `https://YOUR-REPO-NAME.pages.dev` (free domain!)
 - **Custom Domain**: `https://your-custom-domain.com` (if configured)
-- **GitHub Repository**: `https://github.com/YOUR_USERNAME/adhd-learning-hub`
+- **GitHub Repository**: `https://github.com/YOUR_USERNAME/YOUR-REPO-NAME`
+
+**💡 Remember**: Your GitHub repository name becomes your free Cloudflare Pages domain!
 
 ---
 

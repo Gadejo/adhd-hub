@@ -6,18 +6,28 @@ Your ADHD Learning Hub is configured and ready for deployment to Cloudflare Page
 
 ### ⚡ Quick Start (5 minutes)
 
-1. **GitHub Setup**:
+1. **GitHub Repository Name** (Choose your free domain!):
+   Your repo name becomes your free domain: `https://REPO-NAME.pages.dev`
+   
+   **Good options:**
+   - `adhd-hub` → `adhd-hub.pages.dev`
+   - `adhd-learning` → `adhd-learning.pages.dev`
+   - `focus-hub` → `focus-hub.pages.dev`
+   - `YOUR_IGN-adhd` → `your-ign-adhd.pages.dev`
+
+2. **GitHub Setup**:
    ```bash
-   # Create repository on GitHub named: adhd-learning-hub
-   git remote add origin https://github.com/YOUR_USERNAME/adhd-learning-hub.git
+   # Create repository with your chosen name (example: adhd-hub)
+   git remote add origin https://github.com/YOUR_USERNAME/REPO-NAME.git
    git branch -M main
    git push -u origin main
    ```
 
-2. **Cloudflare Pages**:
+3. **Cloudflare Pages**:
    - Go to: https://dash.cloudflare.com → Pages
    - Click "Create a project" → "Connect to Git"
    - Select your repository
+   - **Project name**: Use same as repo name for consistency
    - Build settings:
      - Framework: **Astro**
      - Build command: **npm run build**
@@ -44,8 +54,10 @@ Your ADHD Learning Hub is configured and ready for deployment to Cloudflare Page
 ### 🌐 After Deployment
 
 Your app will be available at:
-- `https://adhd-learning-hub.pages.dev`
-- Custom domain (if configured)
+- `https://YOUR-REPO-NAME.pages.dev` (free domain)
+- Custom domain (if you add one later)
+
+**💡 Pro Tip**: Your GitHub repo name becomes your free Cloudflare Pages domain!
 
 ### 📊 Performance Features
 
