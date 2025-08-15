@@ -9,7 +9,10 @@
       "Bash(mkdir:*)",
       "Bash(npm install)",
       "Bash(npm run test:run:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(npm i:*)",
+      "Bash(mv:*)",
+      "Bash(rmdir:*)"
     ],
     "defaultMode": "acceptEdits"
   }
