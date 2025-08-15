@@ -2,14 +2,16 @@ name: Deploy to Cloudflare Pages
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    name: Build and Deploy
+    permissions:
+      contents: read
+      deployments: write
     
     steps:
       - name: Checkout
@@ -18,13 +20,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
           
       - name: Install dependencies
         run: npm ci
         
-      - name: Build Astro site
+      - name: Build project
         run: npm run build
         
       - name: Deploy to Cloudflare Pages
@@ -32,7 +34,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: adhd-hub # Change this to match your repo name
+          projectName: adhd-hub
           directory: dist
-          # Optional: Set to false if you want to only deploy on main branch
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          wranglerVersion: "3"
