@@ -8,6 +8,12 @@ binding = "DB"
 database_name = "adhd-hub-local"
 database_id = "local"
 
+[env.dev]
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "adhd-hub-dev"
+database_id = "4990c0c1-8125-4d76-ae47-7776d6901503"
+
 [env.production]
 routes = [
   { pattern = "adhd-hub.pages.dev/*", zone_name = "pages.dev" }
@@ -16,12 +22,7 @@ routes = [
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "adhd-hub-prod"
-database_id = "your-database-id-here"
-
-[[env.dev.d1_databases]]
-binding = "DB"
-database_name = "adhd-hub-dev"
-database_id = "your-dev-database-id-here"
+database_id = "f2ba4e8c-f62f-4c87-a252-137d8a2c51aa"
 
 # Build configuration
 [build]

@@ -58,7 +58,7 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
     }
 
     // Generate JWT token
-    const token = generateToken(user);
+    const token = await generateToken(user);
 
     // Set HTTP-only cookie
     cookies.set('auth-token', token, {

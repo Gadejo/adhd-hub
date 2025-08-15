@@ -15,7 +15,7 @@ export const GET: APIRoute = async (context) => {
     const db = new DatabaseService(locals.runtime.env.DB);
     
     // Get user from JWT token
-    const jwtPayload = getUserFromContext(context);
+    const jwtPayload = await getUserFromContext(context);
     if (!jwtPayload) {
       return new Response(JSON.stringify({
         error: 'Not authenticated'

@@ -24,7 +24,7 @@ export const GET: APIRoute = async (context) => {
     const db = new DatabaseService(locals.runtime.env.DB);
     
     // Check authentication
-    const user = getUserFromContext(context);
+    const user = await getUserFromContext(context);
     if (!user) {
       return new Response(JSON.stringify({
         error: 'Authentication required'
@@ -62,7 +62,7 @@ export const POST: APIRoute = async (context) => {
     const db = new DatabaseService(locals.runtime.env.DB);
     
     // Check authentication
-    const user = getUserFromContext(context);
+    const user = await getUserFromContext(context);
     if (!user) {
       return new Response(JSON.stringify({
         error: 'Authentication required'
