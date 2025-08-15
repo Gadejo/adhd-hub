@@ -1,0 +1,312 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopBar from '../components/TopBar.astro';
+---
+
+<Layout title="ADHD Hub - XP System Test">
+  <TopBar title="ADHD Hub" />
+  
+  <main class="flex-1 p-4 md:p-6 lg:p-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">XP System Test</h1>
+        <p class="text-gray-600 dark:text-gray-400">Test the XP and leveling system with simulated activities</p>
+      </div>
+      
+      <!-- Current Status -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Current Status</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="text-center">
+            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="current-level">1</div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Level</p>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400" id="current-xp">0</div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">XP</p>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-green-600 dark:text-green-400" id="xp-to-next">4</div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">XP to Next</p>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-orange-600 dark:text-orange-400" id="current-streak">0</div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Streak</p>
+          </div>
+        </div>
+        
+        <div class="mt-4">
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+            <div 
+              id="progress-bar" 
+              class="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+              style="width: 0%"
+            ></div>
+          </div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center" id="progress-text">0% to next level</p>
+        </div>
+      </div>
+      
+      <!-- Test Actions -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Study Sessions</h3>
+          <div class="space-y-3">
+            <button 
+              id="session-5min"
+              class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            >
+              5 min session (+2 XP)
+            </button>
+            <button 
+              id="session-15min"
+              class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            >
+              15 min session (+4 XP)
+            </button>
+            <button 
+              id="session-25min"
+              class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            >
+              25 min session (+8 XP)
+            </button>
+            <button 
+              id="session-60min"
+              class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            >
+              60 min session (+20 XP)
+            </button>
+          </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Resources</h3>
+          <div class="space-y-3">
+            <button 
+              id="high-priority-resource"
+              class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+            >
+              High Priority Resource (+5 XP)
+            </button>
+            <button 
+              id="normal-priority-resource"
+              class="w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+            >
+              Normal Priority Resource (+0 XP)
+            </button>
+          </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Goals</h3>
+          <div class="space-y-3">
+            <button 
+              id="complete-goal"
+              class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+            >
+              Complete Goal (+10 XP)
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Simulation Results -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 mt-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Actions</h3>
+        <div id="action-log" class="space-y-2 max-h-40 overflow-y-auto">
+          <p class="text-sm text-gray-500 dark:text-gray-400">No actions yet. Click buttons above to test XP system!</p>
+        </div>
+      </div>
+      
+      <!-- Reset Button -->
+      <div class="mt-6 text-center">
+        <button 
+          id="reset-xp"
+          class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+        >
+          Reset XP System
+        </button>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { getAll, saveSession, saveResource, saveGoal, updateGoal, updateSettings } from '../lib/storage.js';
+  import { calculateLevel, simulateXPGrowth } from '../lib/xp.js';
+  
+  // Run simulation in console on page load
+  simulateXPGrowth();
+  
+  function updateDisplay() {
+    const data = getAll();
+    const levelInfo = calculateLevel(data.settings.xp);
+    
+    // Update current status
+    document.getElementById('current-level')!.textContent = levelInfo.level.toString();
+    document.getElementById('current-xp')!.textContent = data.settings.xp.toString();
+    document.getElementById('xp-to-next')!.textContent = (levelInfo.xpForNextLevel - data.settings.xp).toString();
+    document.getElementById('current-streak')!.textContent = data.settings.streak.toString();
+    
+    // Update progress bar
+    const progressPercent = Math.round(levelInfo.progressToNext * 100);
+    document.getElementById('progress-bar')!.style.width = `${progressPercent}%`;
+    document.getElementById('progress-text')!.textContent = `${progressPercent}% to level ${levelInfo.level + 1}`;
+  }
+  
+  function logAction(message: string, xp: number) {
+    const log = document.getElementById('action-log')!;
+    const entry = document.createElement('div');
+    entry.className = 'text-sm text-gray-700 dark:text-gray-300 p-2 bg-gray-100 dark:bg-gray-700 rounded';
+    entry.innerHTML = `
+      <span class="font-medium">${message}</span>
+      ${xp > 0 ? `<span class="ml-2 text-green-600 dark:text-green-400">+${xp} XP</span>` : ''}
+      <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">${new Date().toLocaleTimeString()}</span>
+    `;
+    
+    if (log.children.length === 1 && log.children[0].textContent?.includes('No actions yet')) {
+      log.innerHTML = '';
+    }
+    
+    log.insertBefore(entry, log.firstChild);
+    
+    // Keep only last 10 entries
+    while (log.children.length > 10) {
+      log.removeChild(log.lastChild!);
+    }
+  }
+  
+  // Session buttons
+  document.getElementById('session-5min')?.addEventListener('click', () => {
+    saveSession({
+      startedAt: new Date(),
+      durationMin: 5,
+      subject: 'Test Subject'
+    });
+    logAction('5-minute study session', 2);
+    updateDisplay();
+    window.dispatchEvent(new CustomEvent('xp-updated'));
+  });
+  
+  document.getElementById('session-15min')?.addEventListener('click', () => {
+    saveSession({
+      startedAt: new Date(),
+      durationMin: 15,
+      subject: 'Test Subject'
+    });
+    logAction('15-minute study session', 4);
+    updateDisplay();
+    window.dispatchEvent(new CustomEvent('xp-updated'));
+  });
+  
+  document.getElementById('session-25min')?.addEventListener('click', () => {
+    saveSession({
+      startedAt: new Date(),
+      durationMin: 25,
+      subject: 'Test Subject'
+    });
+    logAction('25-minute study session (Pomodoro)', 8);
+    updateDisplay();
+    window.dispatchEvent(new CustomEvent('xp-updated'));
+  });
+  
+  document.getElementById('session-60min')?.addEventListener('click', () => {
+    saveSession({
+      startedAt: new Date(),
+      durationMin: 60,
+      subject: 'Test Subject'
+    });
+    logAction('60-minute deep focus session', 20);
+    updateDisplay();
+    window.dispatchEvent(new CustomEvent('xp-updated'));
+  });
+  
+  // Resource buttons
+  document.getElementById('high-priority-resource')?.addEventListener('click', () => {
+    saveResource({
+      title: 'Test High Priority Resource',
+      url: 'https://example.com',
+      subject: 'Test Subject',
+      type: 'article',
+      priority: 1,
+      notes: 'Test resource',
+      favorite: false,
+      status: 'not-started'
+    });
+    logAction('Created high-priority resource', 5);
+    updateDisplay();
+    window.dispatchEvent(new CustomEvent('xp-updated'));
+  });
+  
+  document.getElementById('normal-priority-resource')?.addEventListener('click', () => {
+    saveResource({
+      title: 'Test Normal Priority Resource',
+      url: 'https://example.com',
+      subject: 'Test Subject',
+      type: 'article',
+      priority: 3,
+      notes: 'Test resource',
+      favorite: false,
+      status: 'not-started'
+    });
+    logAction('Created normal-priority resource', 0);
+    updateDisplay();
+  });
+  
+  // Goal button
+  document.getElementById('complete-goal')?.addEventListener('click', () => {
+    // Create and immediately complete a goal
+    const goal = saveGoal({
+      name: 'Test Goal',
+      subject: 'Test Subject',
+      dueDate: new Date(),
+      progressPct: 0,
+      status: 'active'
+    });
+    
+    updateGoal(goal.id, { status: 'completed', progressPct: 100 });
+    logAction('Completed a goal', 10);
+    updateDisplay();
+    window.dispatchEvent(new CustomEvent('xp-updated'));
+  });
+  
+  // Reset button
+  document.getElementById('reset-xp')?.addEventListener('click', () => {
+    if (confirm('Are you sure you want to reset the XP system? This will clear all sessions, resources, and goals.')) {
+      updateSettings({
+        theme: 'dark',
+        xp: 0,
+        level: 1,
+        streak: 0,
+        longestStreak: 0
+      });
+      
+      // Clear all data (for testing only)
+      localStorage.setItem('adhd-hub-data', JSON.stringify({
+        resources: [],
+        sessions: [],
+        goals: [],
+        subjects: [],
+        settings: {
+          theme: 'dark',
+          xp: 0,
+          level: 1,
+          streak: 0,
+          longestStreak: 0
+        }
+      }));
+      
+      logAction('XP system reset', 0);
+      updateDisplay();
+      window.dispatchEvent(new CustomEvent('xp-updated'));
+      
+      // Clear log
+      setTimeout(() => {
+        document.getElementById('action-log')!.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">XP system has been reset. Click buttons to test!</p>';
+      }, 1000);
+    }
+  });
+  
+  // Initial display update
+  updateDisplay();
+</script>

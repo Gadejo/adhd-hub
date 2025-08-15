@@ -13,6 +13,31 @@ const currentPath = Astro.url.pathname;
       <div class="flex items-center">
         <h1 class="text-xl font-bold text-gray-900 dark:text-white">{title}</h1>
         
+        <!-- XP/Level Display -->
+        <div class="ml-6 hidden md:flex items-center space-x-4">
+          <div class="flex items-center space-x-2">
+            <div class="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Level <span id="user-level" class="text-blue-600 dark:text-blue-400 font-bold">1</span>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <div class="w-20 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div 
+                  id="xp-progress-bar" 
+                  class="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-300"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <div class="text-xs text-gray-600 dark:text-gray-400" id="xp-display">0 XP</div>
+            </div>
+            
+            <div class="flex items-center space-x-1 text-sm">
+              <span class="text-orange-500">🔥</span>
+              <span id="streak-display" class="text-gray-700 dark:text-gray-300 font-medium">0</span>
+            </div>
+          </div>
+        </div>
+        
         <nav class="ml-8 flex space-x-4">
           <a 
             href="/" 
@@ -74,6 +99,16 @@ const currentPath = Astro.url.pathname;
           >
             Settings
           </a>
+          <a 
+            href="/test-xp" 
+            class={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              currentPath === '/test-xp' 
+                ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
+                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            XP Test
+          </a>
         </nav>
       </div>
       
@@ -111,6 +146,49 @@ const currentPath = Astro.url.pathname;
 
 <script>
   import { exportJSON, importJSON, updateSettings, getAll } from '../lib/storage.js';
+  import { calculateLevel, getLevelMessage } from '../lib/xp.js';
+  
+  // Load and display XP/Level information
+  function updateXPDisplay() {
+    const data = getAll();
+    const levelInfo = calculateLevel(data.settings.xp);
+    
+    // Update level display
+    const levelElement = document.getElementById('user-level');
+    if (levelElement) {
+      levelElement.textContent = levelInfo.level.toString();
+      levelElement.title = getLevelMessage(levelInfo.level);
+    }
+    
+    // Update XP display
+    const xpElement = document.getElementById('xp-display');
+    if (xpElement) {
+      xpElement.textContent = `${data.settings.xp} XP`;
+      xpElement.title = `Next level: ${levelInfo.xpForNextLevel} XP`;
+    }
+    
+    // Update progress bar
+    const progressBar = document.getElementById('xp-progress-bar');
+    if (progressBar) {
+      const progressPercent = Math.round(levelInfo.progressToNext * 100);
+      progressBar.style.width = `${progressPercent}%`;
+      progressBar.title = `${progressPercent}% to level ${levelInfo.level + 1}`;
+    }
+    
+    // Update streak display
+    const streakElement = document.getElementById('streak-display');
+    if (streakElement) {
+      streakElement.textContent = data.settings.streak.toString();
+      streakElement.title = `Current streak: ${data.settings.streak} days\nLongest streak: ${data.settings.longestStreak} days`;
+    }
+  }
+  
+  // Update XP display on page load
+  updateXPDisplay();
+  
+  // Listen for XP updates
+  window.addEventListener('xp-updated', updateXPDisplay);
+  window.addEventListener('session-logged', updateXPDisplay);
   
   // Theme toggle
   document.getElementById('theme-toggle')?.addEventListener('click', () => {

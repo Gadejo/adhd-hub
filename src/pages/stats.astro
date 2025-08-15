@@ -85,6 +85,55 @@ import TopBar from '../components/TopBar.astro';
         </div>
       </div>
       
+      <!-- XP and Level Progress -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 mb-8">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Level Progress</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="text-center">
+            <div class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2" id="current-level">1</div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Current Level</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" id="level-message">Getting started! 🌱</p>
+          </div>
+          
+          <div class="text-center">
+            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-2" id="total-xp">0</div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Total XP</p>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-3">
+              <div 
+                id="level-progress-bar" 
+                class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                style="width: 0%"
+              ></div>
+            </div>
+          </div>
+          
+          <div class="text-center">
+            <div class="text-2xl font-bold text-green-600 dark:text-green-400 mb-2" id="xp-to-next">0</div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">XP to Next Level</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" id="next-level-at">Next: Level 2</p>
+          </div>
+        </div>
+        
+        <!-- XP Sources Breakdown -->
+        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+          <h4 class="text-md font-medium text-gray-900 dark:text-white mb-3">XP Sources</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600 dark:text-gray-400">Study Sessions:</span>
+              <span class="font-medium text-gray-900 dark:text-white">+2 XP per 5 min</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600 dark:text-gray-400">High Priority Resources:</span>
+              <span class="font-medium text-gray-900 dark:text-white">+5 XP</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600 dark:text-gray-400">Completed Goals:</span>
+              <span class="font-medium text-gray-900 dark:text-white">+10 XP</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <!-- Streak and Goals -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
@@ -147,6 +196,7 @@ import TopBar from '../components/TopBar.astro';
 
 <script>
   import { getAll } from '../lib/storage.js';
+  import { calculateLevel, getLevelMessage } from '../lib/xp.js';
   import type { Session, Resource, Goal } from '../lib/models.js';
   
   let currentPeriod = 'today';
@@ -206,6 +256,9 @@ import TopBar from '../components/TopBar.astro';
     
     // Update recent sessions
     updateRecentSessions(data.sessions.slice(-10).reverse());
+    
+    // Update XP and level stats (always use all-time data)
+    updateXPStats(data.settings);
   }
   
   function updateStreakStats(allSessions: Session[]) {
@@ -406,6 +459,27 @@ import TopBar from '../components/TopBar.astro';
     });
     
     updateStats();
+  }
+  
+  function updateXPStats(settings: { xp: number; level: number; streak: number; longestStreak: number }) {
+    const levelInfo = calculateLevel(settings.xp);
+    
+    // Update level display
+    document.getElementById('current-level')!.textContent = levelInfo.level.toString();
+    document.getElementById('level-message')!.textContent = getLevelMessage(levelInfo.level);
+    
+    // Update XP display
+    document.getElementById('total-xp')!.textContent = settings.xp.toString();
+    
+    // Update progress bar
+    const progressPercent = Math.round(levelInfo.progressToNext * 100);
+    const progressBar = document.getElementById('level-progress-bar')!;
+    progressBar.style.width = `${progressPercent}%`;
+    
+    // Update XP to next level
+    const xpToNext = levelInfo.xpForNextLevel - settings.xp;
+    document.getElementById('xp-to-next')!.textContent = xpToNext.toString();
+    document.getElementById('next-level-at')!.textContent = `Next: Level ${levelInfo.level + 1}`;
   }
   
   // Event listeners

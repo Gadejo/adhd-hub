@@ -52,9 +52,10 @@ export interface Subject {
 
 export interface Settings {
   theme: 'dark' | 'light';
-  xp?: number;
-  level?: number;
-  streak?: number;
+  xp: number;
+  level: number;
+  streak: number;
+  longestStreak: number;
   selectedSubjectId?: string; // currently selected subject on dashboard
 }
 

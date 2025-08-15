@@ -1,4 +1,5 @@
 import type { AppData, Resource, Session, Goal, Settings, Subject } from './models.js';
+import { calculateSessionXP, calculateResourceXP, calculateGoalCompletionXP, calculateStreak, calculateLevel } from './xp.js';
 
 const STORAGE_KEY = 'adhd-hub-data';
 
@@ -6,7 +7,8 @@ const defaultSettings: Settings = {
   theme: 'dark',
   xp: 0,
   level: 1,
-  streak: 0
+  streak: 0,
+  longestStreak: 0
 };
 
 const defaultSubjectTemplates: Subject[] = [
@@ -174,6 +176,20 @@ export function saveResource(resource: Omit<Resource, 'id' | 'createdAt' | 'upda
   };
   
   data.resources.push(newResource);
+  
+  // Grant XP for high-priority resources
+  const xpGain = calculateResourceXP(newResource.priority);
+  if (xpGain) {
+    data.settings.xp += xpGain.amount;
+    
+    // Update level based on new XP
+    const levelInfo = calculateLevel(data.settings.xp);
+    data.settings.level = levelInfo.level;
+    
+    console.log(`🎉 +${xpGain.amount} XP: ${xpGain.reason}`);
+    console.log(`📈 Level ${levelInfo.level} (${Math.round(levelInfo.progressToNext * 100)}% to next)`);
+  }
+  
   setAll(data);
   return newResource;
 }
@@ -213,7 +229,28 @@ export function saveSession(session: Omit<Session, 'id'>): Session {
   };
   
   data.sessions.push(newSession);
+  
+  // Grant XP for the session
+  const xpGain = calculateSessionXP(newSession.durationMin);
+  data.settings.xp += xpGain.amount;
+  
+  // Update level based on new XP
+  const levelInfo = calculateLevel(data.settings.xp);
+  data.settings.level = levelInfo.level;
+  
+  // Update streak
+  const streakInfo = calculateStreak(data.sessions);
+  data.settings.streak = streakInfo.currentStreak;
+  data.settings.longestStreak = Math.max(data.settings.longestStreak, streakInfo.longestStreak);
+  
   setAll(data);
+  
+  // Log XP gain for user feedback
+  if (xpGain.amount > 0) {
+    console.log(`🎉 +${xpGain.amount} XP: ${xpGain.reason}`);
+    console.log(`📈 Level ${levelInfo.level} (${Math.round(levelInfo.progressToNext * 100)}% to next)`);
+  }
+  
   return newSession;
 }
 
@@ -238,14 +275,30 @@ export function updateGoal(id: string, updates: Partial<Goal>): Goal | null {
   
   if (index === -1) return null;
   
-  data.goals[index] = {
-    ...data.goals[index],
+  const oldGoal = data.goals[index];
+  const updatedGoal = {
+    ...oldGoal,
     ...updates,
     updatedAt: new Date()
   };
   
+  data.goals[index] = updatedGoal;
+  
+  // Grant XP for completing a goal
+  if (oldGoal.status !== 'completed' && updatedGoal.status === 'completed') {
+    const xpGain = calculateGoalCompletionXP();
+    data.settings.xp += xpGain.amount;
+    
+    // Update level based on new XP
+    const levelInfo = calculateLevel(data.settings.xp);
+    data.settings.level = levelInfo.level;
+    
+    console.log(`🎉 +${xpGain.amount} XP: ${xpGain.reason}`);
+    console.log(`📈 Level ${levelInfo.level} (${Math.round(levelInfo.progressToNext * 100)}% to next)`);
+  }
+  
   setAll(data);
-  return data.goals[index];
+  return updatedGoal;
 }
 
 export function deleteGoal(id: string): boolean {
