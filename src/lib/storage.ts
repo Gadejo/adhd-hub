@@ -1,5 +1,6 @@
 import type { AppData, Resource, Session, Goal, Settings, Subject } from './models.js';
 import { calculateSessionXP, calculateResourceXP, calculateGoalCompletionXP, calculateStreak, calculateLevel } from './xp.js';
+import { calculateReviewProgression, calculateSnoozeDate } from './review.js';
 
 const STORAGE_KEY = 'adhd-hub-data';
 
@@ -415,4 +416,44 @@ export function updateSubjectStats(): void {
   });
   
   setAll(data);
+}
+
+export function reviewResource(id: string): Resource | null {
+  const data = getAll();
+  const index = data.resources.findIndex(r => r.id === id);
+  
+  if (index === -1) return null;
+  
+  const resource = data.resources[index];
+  const reviewResult = calculateReviewProgression(resource);
+  
+  data.resources[index] = {
+    ...resource,
+    status: reviewResult.status,
+    nextReviewDate: reviewResult.nextReviewDate,
+    lastReviewInterval: reviewResult.lastReviewInterval,
+    updatedAt: new Date()
+  };
+  
+  setAll(data);
+  return data.resources[index];
+}
+
+export function snoozeResource(id: string): Resource | null {
+  const data = getAll();
+  const index = data.resources.findIndex(r => r.id === id);
+  
+  if (index === -1) return null;
+  
+  const resource = data.resources[index];
+  const snoozeDate = calculateSnoozeDate(resource);
+  
+  data.resources[index] = {
+    ...resource,
+    nextReviewDate: snoozeDate,
+    updatedAt: new Date()
+  };
+  
+  setAll(data);
+  return data.resources[index];
 }

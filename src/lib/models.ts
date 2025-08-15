@@ -7,8 +7,9 @@ export interface Resource {
   priority: 1 | 2 | 3 | 4 | 5;
   notes: string;
   favorite: boolean;
-  status: 'not-started' | 'in-progress' | 'completed' | 'paused';
+  status: 'new' | 'learning' | 'reviewing' | 'done';
   nextReviewDate?: Date;
+  lastReviewInterval?: number; // in days, tracks current interval for spaced repetition
   createdAt: Date;
   updatedAt: Date;
 }

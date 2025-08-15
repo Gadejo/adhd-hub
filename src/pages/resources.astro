@@ -93,10 +93,10 @@ import ResourceCard from '../components/ResourceCard.astro';
               class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Statuses</option>
-              <option value="not-started">Not Started</option>
-              <option value="in-progress">In Progress</option>
-              <option value="completed">Completed</option>
-              <option value="paused">Paused</option>
+              <option value="new">New</option>
+              <option value="learning">Learning</option>
+              <option value="reviewing">Reviewing</option>
+              <option value="done">Done</option>
             </select>
           </div>
           
@@ -121,6 +121,15 @@ import ResourceCard from '../components/ResourceCard.astro';
               class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"
             >
               Surprise Me!
+            </button>
+          </div>
+          
+          <div class="flex items-end">
+            <button 
+              id="due-today-btn"
+              class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg transition-colors"
+            >
+              Due Today
             </button>
           </div>
           
@@ -261,10 +270,10 @@ import ResourceCard from '../components/ResourceCard.astro';
                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select status...</option>
-                  <option value="not-started">Not Started</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                  <option value="paused">Paused</option>
+                  <option value="new">New</option>
+                  <option value="learning">Learning</option>
+                  <option value="reviewing">Reviewing</option>
+                  <option value="done">Done</option>
                 </select>
               </div>
             </div>
@@ -310,8 +319,11 @@ import ResourceCard from '../components/ResourceCard.astro';
 </Layout>
 
 <script>
-  import { getAll, saveResource, updateResource, deleteResource } from '../lib/storage.js';
-  import type { Resource, ResourceType, ResourceStatus, ResourcePriority } from '../lib/models.js';
+  import { getAll, saveResource, updateResource, deleteResource, reviewResource, snoozeResource } from '../lib/storage.js';
+  import { isDueToday, getDueResources, getReviewProgress, getNextReviewText, formatReviewDate } from '../lib/review.js';
+  import type { Resource, ResourceType, ResourcePriority } from '../lib/models.js';
+  
+  type ResourceStatus = Resource['status'];
   
   let allResources: Resource[] = [];
   let filteredResources: Resource[] = [];
@@ -377,6 +389,8 @@ import ResourceCard from '../components/ResourceCard.astro';
     });
   }
   
+  let showDueToday = false;
+  
   function applyFilters() {
     const searchTerm = searchInput.value.toLowerCase();
     const subjectFilterValue = subjectFilter.value;
@@ -395,8 +409,9 @@ import ResourceCard from '../components/ResourceCard.astro';
       const matchesType = !typeFilterValue || resource.type === typeFilterValue;
       const matchesPriority = !priorityFilterValue || resource.priority.toString() === priorityFilterValue;
       const matchesStatus = !statusFilterValue || resource.status === statusFilterValue;
+      const matchesDueToday = !showDueToday || isDueToday(resource);
       
-      return matchesSearch && matchesSubject && matchesType && matchesPriority && matchesStatus;
+      return matchesSearch && matchesSubject && matchesType && matchesPriority && matchesStatus && matchesDueToday;
     });
     
     // Sort resources
@@ -532,6 +547,50 @@ import ResourceCard from '../components/ResourceCard.astro';
         deleteResourceConfirm(id);
       });
     });
+    
+    // Review buttons
+    document.querySelectorAll('.review-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.id!;
+        handleReview(id);
+      });
+    });
+    
+    // Snooze buttons
+    document.querySelectorAll('.snooze-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.id!;
+        handleSnooze(id);
+      });
+    });
+  }
+  
+  function handleReview(id: string) {
+    const resource = allResources.find(r => r.id === id);
+    if (!resource) return;
+    
+    const updatedResource = reviewResource(id);
+    if (updatedResource) {
+      console.log(`📚 Reviewed: ${resource.title}`);
+      console.log(`📊 Status: ${resource.status} → ${updatedResource.status}`);
+      if (updatedResource.nextReviewDate) {
+        console.log(`📅 Next review: ${updatedResource.nextReviewDate.toLocaleDateString()}`);
+      } else {
+        console.log(`✅ Completed! No more reviews needed.`);
+      }
+      loadResources();
+    }
+  }
+  
+  function handleSnooze(id: string) {
+    const resource = allResources.find(r => r.id === id);
+    if (!resource) return;
+    
+    const updatedResource = snoozeResource(id);
+    if (updatedResource && updatedResource.nextReviewDate) {
+      console.log(`⏰ Snoozed: ${resource.title} until ${updatedResource.nextReviewDate.toLocaleDateString()}`);
+      loadResources();
+    }
   }
   
   function showModal(title: string) {
@@ -591,7 +650,30 @@ import ResourceCard from '../components/ResourceCard.astro';
     priorityFilter.value = '';
     statusFilter.value = '';
     sortSelect.value = 'priority';
+    showDueToday = false;
+    updateDueTodayButton();
     applyFilters();
+  }
+  
+  function toggleDueToday() {
+    showDueToday = !showDueToday;
+    updateDueTodayButton();
+    applyFilters();
+  }
+  
+  function updateDueTodayButton() {
+    const btn = document.getElementById('due-today-btn');
+    if (btn) {
+      if (showDueToday) {
+        btn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
+        btn.classList.add('bg-yellow-800', 'hover:bg-yellow-900');
+        btn.textContent = 'Due Today ✓';
+      } else {
+        btn.classList.remove('bg-yellow-800', 'hover:bg-yellow-900');
+        btn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
+        btn.textContent = 'Due Today';
+      }
+    }
   }
   
   // Event listeners
@@ -600,6 +682,7 @@ import ResourceCard from '../components/ResourceCard.astro';
   document.getElementById('close-modal')?.addEventListener('click', hideModal);
   document.getElementById('cancel-btn')?.addEventListener('click', hideModal);
   document.getElementById('surprise-me-btn')?.addEventListener('click', surpriseMe);
+  document.getElementById('due-today-btn')?.addEventListener('click', toggleDueToday);
   document.getElementById('clear-filters-btn')?.addEventListener('click', clearFilters);
   
   // Filter event listeners
