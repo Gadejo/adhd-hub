@@ -1,0 +1,656 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopBar from '../components/TopBar.astro';
+import ResourceCard from '../components/ResourceCard.astro';
+---
+
+<Layout title="ADHD Hub - Resources">
+  <TopBar title="ADHD Hub" />
+  
+  <main class="flex-1 p-4 md:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Resources</h1>
+          <p class="text-gray-600 dark:text-gray-400">Manage your learning resources and materials</p>
+        </div>
+        <button 
+          id="add-resource-btn"
+          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+        >
+          Add Resource
+        </button>
+      </div>
+      
+      <!-- Search and Filters -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <div class="md:col-span-2">
+            <label for="search-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Search (press "/" to focus)
+            </label>
+            <input 
+              type="text" 
+              id="search-input"
+              placeholder="Search resources..."
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+          </div>
+          <div>
+            <label for="subject-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Subject
+            </label>
+            <select 
+              id="subject-filter"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Subjects</option>
+            </select>
+          </div>
+          <div>
+            <label for="type-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Type
+            </label>
+            <select 
+              id="type-filter"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Types</option>
+              <option value="video">Video</option>
+              <option value="article">Article</option>
+              <option value="book">Book</option>
+              <option value="course">Course</option>
+              <option value="podcast">Podcast</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="flex flex-wrap gap-3">
+          <div>
+            <label for="priority-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Priority
+            </label>
+            <select 
+              id="priority-filter"
+              class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Priorities</option>
+              <option value="1">Priority 1 (Highest)</option>
+              <option value="2">Priority 2</option>
+              <option value="3">Priority 3</option>
+              <option value="4">Priority 4</option>
+              <option value="5">Priority 5 (Lowest)</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="status-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Status
+            </label>
+            <select 
+              id="status-filter"
+              class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Statuses</option>
+              <option value="not-started">Not Started</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="paused">Paused</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="sort-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Sort By
+            </label>
+            <select 
+              id="sort-select"
+              class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="priority">Priority</option>
+              <option value="updated">Recently Updated</option>
+              <option value="created">Recently Created</option>
+              <option value="title">Title A-Z</option>
+            </select>
+          </div>
+          
+          <div class="flex items-end">
+            <button 
+              id="surprise-me-btn"
+              class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"
+            >
+              Surprise Me!
+            </button>
+          </div>
+          
+          <div class="flex items-end">
+            <button 
+              id="clear-filters-btn"
+              class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Resources Grid -->
+      <div id="resources-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+        <!-- Resources will be dynamically loaded here -->
+      </div>
+      
+      <div id="no-resources" class="text-center py-12 hidden">
+        <div class="text-gray-400 dark:text-gray-500 mb-4">
+          <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No resources found</h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your filters or add a new resource to get started.</p>
+        <button 
+          class="add-resource-trigger px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+        >
+          Add Your First Resource
+        </button>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Add/Edit Resource Modal -->
+  <div id="resource-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 id="modal-title" class="text-lg font-semibold text-gray-900 dark:text-white">Add Resource</h3>
+            <button id="close-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <form id="resource-form" class="space-y-4">
+            <input type="hidden" id="resource-id">
+            
+            <div>
+              <label for="resource-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Title *
+              </label>
+              <input 
+                type="text" 
+                id="resource-title"
+                required
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+            </div>
+            
+            <div>
+              <label for="resource-url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                URL *
+              </label>
+              <input 
+                type="url" 
+                id="resource-url"
+                required
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="resource-subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Subject *
+                </label>
+                <select 
+                  id="resource-subject"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select subject...</option>
+                </select>
+              </div>
+              
+              <div>
+                <label for="resource-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Type *
+                </label>
+                <select 
+                  id="resource-type"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select type...</option>
+                  <option value="video">Video</option>
+                  <option value="article">Article</option>
+                  <option value="book">Book</option>
+                  <option value="course">Course</option>
+                  <option value="podcast">Podcast</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="resource-priority" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Priority *
+                </label>
+                <select 
+                  id="resource-priority"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select priority...</option>
+                  <option value="1">1 (Highest)</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5 (Lowest)</option>
+                </select>
+              </div>
+              
+              <div>
+                <label for="resource-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Status *
+                </label>
+                <select 
+                  id="resource-status"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select status...</option>
+                  <option value="not-started">Not Started</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                  <option value="paused">Paused</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <label class="flex items-center">
+                <input type="checkbox" id="resource-favorite" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500">
+                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Mark as favorite</span>
+              </label>
+            </div>
+            
+            <div>
+              <label for="resource-notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Notes
+              </label>
+              <textarea 
+                id="resource-notes"
+                rows="3"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></textarea>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+              <button 
+                type="button" 
+                id="cancel-btn"
+                class="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+              >
+                Save Resource
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { getAll, saveResource, updateResource, deleteResource } from '../lib/storage.js';
+  import type { Resource, ResourceType, ResourceStatus, ResourcePriority } from '../lib/models.js';
+  
+  let allResources: Resource[] = [];
+  let filteredResources: Resource[] = [];
+  let editingId: string | null = null;
+  
+  // DOM elements
+  const resourcesContainer = document.getElementById('resources-container')!;
+  const noResourcesEl = document.getElementById('no-resources')!;
+  const modal = document.getElementById('resource-modal')!;
+  const modalTitle = document.getElementById('modal-title')!;
+  const form = document.getElementById('resource-form') as HTMLFormElement;
+  
+  // Form elements
+  const resourceIdInput = document.getElementById('resource-id') as HTMLInputElement;
+  const titleInput = document.getElementById('resource-title') as HTMLInputElement;
+  const urlInput = document.getElementById('resource-url') as HTMLInputElement;
+  const subjectSelect = document.getElementById('resource-subject') as HTMLSelectElement;
+  const typeSelect = document.getElementById('resource-type') as HTMLSelectElement;
+  const prioritySelect = document.getElementById('resource-priority') as HTMLSelectElement;
+  const statusSelect = document.getElementById('resource-status') as HTMLSelectElement;
+  const favoriteCheckbox = document.getElementById('resource-favorite') as HTMLInputElement;
+  const notesTextarea = document.getElementById('resource-notes') as HTMLTextAreaElement;
+  
+  // Filter elements
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const subjectFilter = document.getElementById('subject-filter') as HTMLSelectElement;
+  const typeFilter = document.getElementById('type-filter') as HTMLSelectElement;
+  const priorityFilter = document.getElementById('priority-filter') as HTMLSelectElement;
+  const statusFilter = document.getElementById('status-filter') as HTMLSelectElement;
+  const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
+  
+  function loadResources() {
+    const data = getAll();
+    allResources = data.resources;
+    updateSubjectFilter();
+    loadSubjectsForForm();
+    applyFilters();
+  }
+  
+  function loadSubjectsForForm() {
+    const data = getAll();
+    const userSubjects = data.subjects.filter(s => !s.isTemplate);
+    
+    // Clear existing options except the first one
+    subjectSelect.innerHTML = '<option value="">Select subject...</option>';
+    
+    userSubjects.forEach(subject => {
+      const option = document.createElement('option');
+      option.value = subject.name;
+      option.textContent = subject.name;
+      subjectSelect.appendChild(option);
+    });
+  }
+  
+  function updateSubjectFilter() {
+    const subjects = [...new Set(allResources.map(r => r.subject))].sort();
+    subjectFilter.innerHTML = '<option value="">All Subjects</option>';
+    subjects.forEach(subject => {
+      const option = document.createElement('option');
+      option.value = subject;
+      option.textContent = subject;
+      subjectFilter.appendChild(option);
+    });
+  }
+  
+  function applyFilters() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const subjectFilterValue = subjectFilter.value;
+    const typeFilterValue = typeFilter.value;
+    const priorityFilterValue = priorityFilter.value;
+    const statusFilterValue = statusFilter.value;
+    const sortBy = sortSelect.value;
+    
+    filteredResources = allResources.filter(resource => {
+      const matchesSearch = !searchTerm || 
+        resource.title.toLowerCase().includes(searchTerm) ||
+        resource.subject.toLowerCase().includes(searchTerm) ||
+        resource.notes.toLowerCase().includes(searchTerm);
+      
+      const matchesSubject = !subjectFilterValue || resource.subject === subjectFilterValue;
+      const matchesType = !typeFilterValue || resource.type === typeFilterValue;
+      const matchesPriority = !priorityFilterValue || resource.priority.toString() === priorityFilterValue;
+      const matchesStatus = !statusFilterValue || resource.status === statusFilterValue;
+      
+      return matchesSearch && matchesSubject && matchesType && matchesPriority && matchesStatus;
+    });
+    
+    // Sort resources
+    filteredResources.sort((a, b) => {
+      switch (sortBy) {
+        case 'priority':
+          return a.priority - b.priority;
+        case 'updated':
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+        case 'created':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 'title':
+          return a.title.localeCompare(b.title);
+        default:
+          return 0;
+      }
+    });
+    
+    renderResources();
+  }
+  
+  function renderResources() {
+    if (filteredResources.length === 0) {
+      resourcesContainer.innerHTML = '';
+      noResourcesEl.classList.remove('hidden');
+    } else {
+      noResourcesEl.classList.add('hidden');
+      resourcesContainer.innerHTML = filteredResources.map(resource => `
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 resource-card" data-resource-id="${resource.id}">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate mb-1">
+                ${resource.title}
+                ${resource.favorite ? '<span class="ml-2 text-yellow-500">★</span>' : ''}
+              </h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">${resource.subject}</p>
+            </div>
+            
+            <div class="flex items-center space-x-2 ml-4">
+              <button 
+                class="edit-btn p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                data-id="${resource.id}"
+                aria-label="Edit resource"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+              </button>
+              <button 
+                class="delete-btn p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                data-id="${resource.id}"
+                aria-label="Delete resource"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <div class="flex flex-wrap gap-2 mb-3">
+            <span class="px-2 py-1 text-xs font-medium rounded-full ${getPriorityClass(resource.priority)}">
+              Priority ${resource.priority}
+            </span>
+            <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusClass(resource.status)}">
+              ${resource.status.replace('-', ' ')}
+            </span>
+            <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+              ${resource.type}
+            </span>
+          </div>
+          
+          ${resource.notes ? `<p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">${resource.notes}</p>` : ''}
+          
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500 dark:text-gray-400">
+              Updated ${new Date(resource.updatedAt).toLocaleDateString()}
+            </span>
+            <a 
+              href="${resource.url}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
+            >
+              Open
+              <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      `).join('');
+      
+      // Re-attach event listeners to action buttons
+      attachCardEventListeners();
+    }
+  }
+  
+  function getPriorityClass(priority: ResourcePriority): string {
+    const classes = {
+      1: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+      2: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
+      3: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+      4: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+      5: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
+    };
+    return classes[priority];
+  }
+  
+  function getStatusClass(status: ResourceStatus): string {
+    const classes = {
+      'not-started': 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+      'in-progress': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+      'completed': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+      'paused': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+    };
+    return classes[status];
+  }
+  
+  function attachCardEventListeners() {
+    // Edit buttons
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.id!;
+        editResource(id);
+      });
+    });
+    
+    // Delete buttons
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.id!;
+        deleteResourceConfirm(id);
+      });
+    });
+  }
+  
+  function showModal(title: string) {
+    modalTitle.textContent = title;
+    modal.classList.remove('hidden');
+    titleInput.focus();
+  }
+  
+  function hideModal() {
+    modal.classList.add('hidden');
+    form.reset();
+    editingId = null;
+  }
+  
+  function editResource(id: string) {
+    const resource = allResources.find(r => r.id === id);
+    if (!resource) return;
+    
+    editingId = id;
+    resourceIdInput.value = id;
+    titleInput.value = resource.title;
+    urlInput.value = resource.url;
+    subjectSelect.value = resource.subject;
+    typeSelect.value = resource.type;
+    prioritySelect.value = resource.priority.toString();
+    statusSelect.value = resource.status;
+    favoriteCheckbox.checked = resource.favorite;
+    notesTextarea.value = resource.notes;
+    
+    showModal('Edit Resource');
+  }
+  
+  function deleteResourceConfirm(id: string) {
+    const resource = allResources.find(r => r.id === id);
+    if (!resource) return;
+    
+    if (confirm(`Are you sure you want to delete "${resource.title}"?`)) {
+      deleteResource(id);
+      loadResources();
+    }
+  }
+  
+  function surpriseMe() {
+    if (filteredResources.length === 0) {
+      alert('No resources match your current filters!');
+      return;
+    }
+    
+    const randomResource = filteredResources[Math.floor(Math.random() * filteredResources.length)];
+    window.open(randomResource.url, '_blank', 'noopener,noreferrer');
+  }
+  
+  function clearFilters() {
+    searchInput.value = '';
+    subjectFilter.value = '';
+    typeFilter.value = '';
+    priorityFilter.value = '';
+    statusFilter.value = '';
+    sortSelect.value = 'priority';
+    applyFilters();
+  }
+  
+  // Event listeners
+  document.getElementById('add-resource-btn')?.addEventListener('click', () => showModal('Add Resource'));
+  document.querySelector('.add-resource-trigger')?.addEventListener('click', () => showModal('Add Resource'));
+  document.getElementById('close-modal')?.addEventListener('click', hideModal);
+  document.getElementById('cancel-btn')?.addEventListener('click', hideModal);
+  document.getElementById('surprise-me-btn')?.addEventListener('click', surpriseMe);
+  document.getElementById('clear-filters-btn')?.addEventListener('click', clearFilters);
+  
+  // Filter event listeners
+  searchInput.addEventListener('input', applyFilters);
+  subjectFilter.addEventListener('change', applyFilters);
+  typeFilter.addEventListener('change', applyFilters);
+  priorityFilter.addEventListener('change', applyFilters);
+  statusFilter.addEventListener('change', applyFilters);
+  sortSelect.addEventListener('change', applyFilters);
+  
+  // Form submission
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const resourceData = {
+      title: titleInput.value,
+      url: urlInput.value,
+      subject: subjectSelect.value,
+      type: typeSelect.value as ResourceType,
+      priority: parseInt(prioritySelect.value) as ResourcePriority,
+      status: statusSelect.value as ResourceStatus,
+      favorite: favoriteCheckbox.checked,
+      notes: notesTextarea.value
+    };
+    
+    if (editingId) {
+      updateResource(editingId, resourceData);
+    } else {
+      saveResource(resourceData);
+    }
+    
+    hideModal();
+    loadResources();
+  });
+  
+  // Close modal on outside click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      hideModal();
+    }
+  });
+  
+  // Initialize
+  loadResources();
+</script>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

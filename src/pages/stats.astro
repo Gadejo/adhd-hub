@@ -1,0 +1,424 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopBar from '../components/TopBar.astro';
+---
+
+<Layout title="ADHD Hub - Stats">
+  <TopBar title="ADHD Hub" />
+  
+  <main class="flex-1 p-4 md:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Statistics</h1>
+        <p class="text-gray-600 dark:text-gray-400">Track your learning progress and productivity</p>
+      </div>
+      
+      <!-- Time Period Selector -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 mb-6">
+        <div class="flex flex-wrap gap-4">
+          <button 
+            id="period-today"
+            class="period-btn px-4 py-2 rounded-lg font-medium transition-colors bg-blue-600 text-white"
+            data-period="today"
+          >
+            Today
+          </button>
+          <button 
+            id="period-week"
+            class="period-btn px-4 py-2 rounded-lg font-medium transition-colors bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+            data-period="week"
+          >
+            Last 7 Days
+          </button>
+          <button 
+            id="period-all"
+            class="period-btn px-4 py-2 rounded-lg font-medium transition-colors bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+            data-period="all"
+          >
+            All Time
+          </button>
+        </div>
+      </div>
+      
+      <!-- Study Time Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Study Time</p>
+              <p id="total-minutes" class="text-2xl font-bold text-gray-900 dark:text-white">0 min</p>
+            </div>
+            <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
+              <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Study Sessions</p>
+              <p id="total-sessions" class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+            </div>
+            <div class="p-3 bg-green-100 dark:bg-green-900 rounded-full">
+              <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Average Session</p>
+              <p id="avg-session" class="text-2xl font-bold text-gray-900 dark:text-white">0 min</p>
+            </div>
+            <div class="p-3 bg-purple-100 dark:bg-purple-900 rounded-full">
+              <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Streak and Goals -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Study Streak</h3>
+          <div class="text-center">
+            <div id="current-streak" class="text-4xl font-bold text-orange-600 dark:text-orange-400 mb-2">0</div>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Consecutive days</p>
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              <p>Longest streak: <span id="longest-streak" class="font-semibold">0 days</span></p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Goals Progress</h3>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600 dark:text-gray-400">Active Goals</span>
+              <span id="active-goals" class="font-semibold text-gray-900 dark:text-white">0</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600 dark:text-gray-400">Completed Goals</span>
+              <span id="completed-goals" class="font-semibold text-gray-900 dark:text-white">0</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600 dark:text-gray-400">Average Progress</span>
+              <span id="avg-progress" class="font-semibold text-gray-900 dark:text-white">0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Resources by Status -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Resources by Status</h3>
+          <div id="resources-by-status" class="space-y-3">
+            <!-- Resources breakdown will be dynamically populated -->
+          </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Study Time by Subject</h3>
+          <div id="time-by-subject" class="space-y-3">
+            <!-- Subject breakdown will be dynamically populated -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recent Activity -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Study Sessions</h3>
+        <div id="recent-sessions" class="space-y-2">
+          <!-- Recent sessions will be dynamically populated -->
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { getAll } from '../lib/storage.js';
+  import type { Session, Resource, Goal } from '../lib/models.js';
+  
+  let currentPeriod = 'today';
+  
+  function updateStats() {
+    const data = getAll();
+    const now = new Date();
+    
+    // Filter sessions based on selected period
+    let filteredSessions: Session[] = [];
+    
+    switch (currentPeriod) {
+      case 'today':
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        filteredSessions = data.sessions.filter(s => {
+          const sessionDate = new Date(s.startedAt);
+          sessionDate.setHours(0, 0, 0, 0);
+          return sessionDate.getTime() === today.getTime();
+        });
+        break;
+        
+      case 'week':
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        filteredSessions = data.sessions.filter(s => 
+          new Date(s.startedAt) >= weekAgo
+        );
+        break;
+        
+      case 'all':
+        filteredSessions = data.sessions;
+        break;
+    }
+    
+    // Calculate basic stats
+    const totalMinutes = filteredSessions.reduce((sum, s) => sum + s.durationMin, 0);
+    const totalSessions = filteredSessions.length;
+    const avgSession = totalSessions > 0 ? Math.round(totalMinutes / totalSessions) : 0;
+    
+    // Update basic stats display
+    document.getElementById('total-minutes')!.textContent = `${totalMinutes} min`;
+    document.getElementById('total-sessions')!.textContent = totalSessions.toString();
+    document.getElementById('avg-session')!.textContent = `${avgSession} min`;
+    
+    // Calculate streak (always based on all sessions, not filtered)
+    updateStreakStats(data.sessions);
+    
+    // Update goals stats
+    updateGoalsStats(data.goals);
+    
+    // Update resources by status
+    updateResourcesStats(data.resources);
+    
+    // Update time by subject
+    updateTimeBySubject(filteredSessions);
+    
+    // Update recent sessions
+    updateRecentSessions(data.sessions.slice(-10).reverse());
+  }
+  
+  function updateStreakStats(allSessions: Session[]) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Get unique days with study time
+    const studyDays = [...new Set(allSessions.map(s => {
+      const date = new Date(s.startedAt);
+      date.setHours(0, 0, 0, 0);
+      return date.getTime();
+    }))].sort((a, b) => b - a);
+    
+    // Calculate current streak
+    let currentStreak = 0;
+    for (let i = 0; i < studyDays.length; i++) {
+      const expectedDate = today.getTime() - (i * 24 * 60 * 60 * 1000);
+      if (studyDays[i] === expectedDate) {
+        const dayMinutes = allSessions
+          .filter(s => {
+            const sessionDate = new Date(s.startedAt);
+            sessionDate.setHours(0, 0, 0, 0);
+            return sessionDate.getTime() === studyDays[i];
+          })
+          .reduce((sum, s) => sum + s.durationMin, 0);
+        
+        if (dayMinutes > 0) {
+          currentStreak++;
+        } else {
+          break;
+        }
+      } else {
+        break;
+      }
+    }
+    
+    // Calculate longest streak
+    let longestStreak = 0;
+    let tempStreak = 0;
+    let lastDay = 0;
+    
+    for (const day of studyDays.reverse()) {
+      if (lastDay === 0 || day === lastDay + (24 * 60 * 60 * 1000)) {
+        tempStreak++;
+        longestStreak = Math.max(longestStreak, tempStreak);
+      } else {
+        tempStreak = 1;
+      }
+      lastDay = day;
+    }
+    
+    document.getElementById('current-streak')!.textContent = currentStreak.toString();
+    document.getElementById('longest-streak')!.textContent = `${longestStreak} days`;
+  }
+  
+  function updateGoalsStats(goals: Goal[]) {
+    const activeGoals = goals.filter(g => g.status === 'active').length;
+    const completedGoals = goals.filter(g => g.status === 'completed').length;
+    const avgProgress = goals.length > 0 
+      ? Math.round(goals.reduce((sum, g) => sum + g.progressPct, 0) / goals.length)
+      : 0;
+    
+    document.getElementById('active-goals')!.textContent = activeGoals.toString();
+    document.getElementById('completed-goals')!.textContent = completedGoals.toString();
+    document.getElementById('avg-progress')!.textContent = `${avgProgress}%`;
+  }
+  
+  function updateResourcesStats(resources: Resource[]) {
+    const statusCounts = {
+      'not-started': 0,
+      'in-progress': 0,
+      'completed': 0,
+      'paused': 0
+    };
+    
+    resources.forEach(r => {
+      statusCounts[r.status]++;
+    });
+    
+    const total = resources.length;
+    const container = document.getElementById('resources-by-status')!;
+    
+    if (total === 0) {
+      container.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No resources yet</p>';
+      return;
+    }
+    
+    const statusLabels = {
+      'not-started': 'Not Started',
+      'in-progress': 'In Progress', 
+      'completed': 'Completed',
+      'paused': 'Paused'
+    };
+    
+    const statusColors = {
+      'not-started': 'bg-gray-400',
+      'in-progress': 'bg-blue-500',
+      'completed': 'bg-green-500',
+      'paused': 'bg-yellow-500'
+    };
+    
+    container.innerHTML = Object.entries(statusCounts)
+      .map(([status, count]) => {
+        const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+        return `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="w-3 h-3 rounded-full ${statusColors[status as keyof typeof statusColors]} mr-2"></div>
+              <span class="text-sm text-gray-600 dark:text-gray-400">${statusLabels[status as keyof typeof statusLabels]}</span>
+            </div>
+            <div class="flex items-center">
+              <span class="text-sm font-semibold text-gray-900 dark:text-white mr-2">${count}</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">(${percentage}%)</span>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+  }
+  
+  function updateTimeBySubject(sessions: Session[]) {
+    const subjectTimes: Record<string, number> = {};
+    
+    sessions.forEach(s => {
+      if (s.subject) {
+        subjectTimes[s.subject] = (subjectTimes[s.subject] || 0) + s.durationMin;
+      }
+    });
+    
+    const container = document.getElementById('time-by-subject')!;
+    const totalTime = Object.values(subjectTimes).reduce((sum, time) => sum + time, 0);
+    
+    if (totalTime === 0) {
+      container.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No study time recorded</p>';
+      return;
+    }
+    
+    const sortedSubjects = Object.entries(subjectTimes)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 5); // Show top 5 subjects
+    
+    container.innerHTML = sortedSubjects
+      .map(([subject, minutes]) => {
+        const percentage = Math.round((minutes / totalTime) * 100);
+        return `
+          <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+              <span class="text-sm text-gray-900 dark:text-white truncate">${subject}</span>
+            </div>
+            <div class="flex items-center ml-4">
+              <span class="text-sm font-semibold text-gray-900 dark:text-white mr-2">${minutes}m</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">(${percentage}%)</span>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+  }
+  
+  function updateRecentSessions(sessions: Session[]) {
+    const container = document.getElementById('recent-sessions')!;
+    
+    if (sessions.length === 0) {
+      container.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No study sessions yet</p>';
+      return;
+    }
+    
+    container.innerHTML = sessions
+      .map(session => {
+        const date = new Date(session.startedAt).toLocaleDateString();
+        const time = new Date(session.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        return `
+          <div class="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center">
+                <span class="text-sm font-medium text-gray-900 dark:text-white mr-2">${session.durationMin} min</span>
+                ${session.subject ? `<span class="text-xs text-gray-500 dark:text-gray-400">• ${session.subject}</span>` : ''}
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">${date} at ${time}</div>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+  }
+  
+  function switchPeriod(period: string) {
+    currentPeriod = period;
+    
+    // Update button styles
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      if (btn.getAttribute('data-period') === period) {
+        btn.className = 'period-btn px-4 py-2 rounded-lg font-medium transition-colors bg-blue-600 text-white';
+      } else {
+        btn.className = 'period-btn px-4 py-2 rounded-lg font-medium transition-colors bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600';
+      }
+    });
+    
+    updateStats();
+  }
+  
+  // Event listeners
+  document.querySelectorAll('.period-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const period = (e.currentTarget as HTMLElement).getAttribute('data-period')!;
+      switchPeriod(period);
+    });
+  });
+  
+  // Initialize
+  updateStats();
+  
+  // Update stats when a session is logged
+  window.addEventListener('session-logged', updateStats);
+</script>

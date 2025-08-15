@@ -1,0 +1,550 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopBar from '../components/TopBar.astro';
+---
+
+<Layout title="ADHD Hub - Goals">
+  <TopBar title="ADHD Hub" />
+  
+  <main class="flex-1 p-4 md:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Goals</h1>
+          <p class="text-gray-600 dark:text-gray-400">Track your learning objectives and progress</p>
+        </div>
+        <button 
+          id="add-goal-btn"
+          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+        >
+          Add Goal
+        </button>
+      </div>
+      
+      <!-- Filters -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label for="status-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Status
+            </label>
+            <select 
+              id="status-filter"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+              <option value="paused">Paused</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="subject-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Subject
+            </label>
+            <select 
+              id="subject-filter"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Subjects</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="sort-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Sort By
+            </label>
+            <select 
+              id="sort-select"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="dueDate">Due Date</option>
+              <option value="progress">Progress</option>
+              <option value="created">Recently Created</option>
+              <option value="name">Name A-Z</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Goals Grid -->
+      <div id="goals-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+        <!-- Goals will be dynamically loaded here -->
+      </div>
+      
+      <div id="no-goals" class="text-center py-12 hidden">
+        <div class="text-gray-400 dark:text-gray-500 mb-4">
+          <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No goals found</h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-4">Set your first learning goal to get started.</p>
+        <button 
+          class="add-goal-trigger px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+        >
+          Add Your First Goal
+        </button>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Add/Edit Goal Modal -->
+  <div id="goal-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 id="modal-title" class="text-lg font-semibold text-gray-900 dark:text-white">Add Goal</h3>
+            <button id="close-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <form id="goal-form" class="space-y-4">
+            <input type="hidden" id="goal-id">
+            
+            <div>
+              <label for="goal-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Goal Name *
+              </label>
+              <input 
+                type="text" 
+                id="goal-name"
+                required
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., Complete Calculus Course"
+              >
+            </div>
+            
+            <div>
+              <label for="goal-subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Subject *
+              </label>
+              <input 
+                type="text" 
+                id="goal-subject"
+                required
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., Mathematics"
+              >
+            </div>
+            
+            <div>
+              <label for="goal-due-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Due Date *
+              </label>
+              <input 
+                type="date" 
+                id="goal-due-date"
+                required
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="goal-progress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Progress %
+                </label>
+                <input 
+                  type="number" 
+                  id="goal-progress"
+                  min="0"
+                  max="100"
+                  value="0"
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+              </div>
+              
+              <div>
+                <label for="goal-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Status *
+                </label>
+                <select 
+                  id="goal-status"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="active">Active</option>
+                  <option value="completed">Completed</option>
+                  <option value="paused">Paused</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+              <button 
+                type="button" 
+                id="cancel-btn"
+                class="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+              >
+                Save Goal
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { getAll, saveGoal, updateGoal, deleteGoal } from '../lib/storage.js';
+  import type { Goal, GoalStatus } from '../lib/models.js';
+  
+  let allGoals: Goal[] = [];
+  let filteredGoals: Goal[] = [];
+  let editingId: string | null = null;
+  
+  // DOM elements
+  const goalsContainer = document.getElementById('goals-container')!;
+  const noGoalsEl = document.getElementById('no-goals')!;
+  const modal = document.getElementById('goal-modal')!;
+  const modalTitle = document.getElementById('modal-title')!;
+  const form = document.getElementById('goal-form') as HTMLFormElement;
+  
+  // Form elements
+  const goalIdInput = document.getElementById('goal-id') as HTMLInputElement;
+  const nameInput = document.getElementById('goal-name') as HTMLInputElement;
+  const subjectInput = document.getElementById('goal-subject') as HTMLInputElement;
+  const dueDateInput = document.getElementById('goal-due-date') as HTMLInputElement;
+  const progressInput = document.getElementById('goal-progress') as HTMLInputElement;
+  const statusSelect = document.getElementById('goal-status') as HTMLSelectElement;
+  
+  // Filter elements
+  const statusFilter = document.getElementById('status-filter') as HTMLSelectElement;
+  const subjectFilter = document.getElementById('subject-filter') as HTMLSelectElement;
+  const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
+  
+  function loadGoals() {
+    const data = getAll();
+    allGoals = data.goals;
+    updateSubjectFilter();
+    applyFilters();
+  }
+  
+  function updateSubjectFilter() {
+    const subjects = [...new Set(allGoals.map(g => g.subject))].sort();
+    subjectFilter.innerHTML = '<option value="">All Subjects</option>';
+    subjects.forEach(subject => {
+      const option = document.createElement('option');
+      option.value = subject;
+      option.textContent = subject;
+      subjectFilter.appendChild(option);
+    });
+  }
+  
+  function applyFilters() {
+    const statusFilterValue = statusFilter.value;
+    const subjectFilterValue = subjectFilter.value;
+    const sortBy = sortSelect.value;
+    
+    filteredGoals = allGoals.filter(goal => {
+      const matchesStatus = !statusFilterValue || goal.status === statusFilterValue;
+      const matchesSubject = !subjectFilterValue || goal.subject === subjectFilterValue;
+      
+      return matchesStatus && matchesSubject;
+    });
+    
+    // Sort goals
+    filteredGoals.sort((a, b) => {
+      switch (sortBy) {
+        case 'dueDate':
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        case 'progress':
+          return b.progressPct - a.progressPct;
+        case 'created':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 'name':
+          return a.name.localeCompare(b.name);
+        default:
+          return 0;
+      }
+    });
+    
+    renderGoals();
+  }
+  
+  function renderGoals() {
+    if (filteredGoals.length === 0) {
+      goalsContainer.innerHTML = '';
+      noGoalsEl.classList.remove('hidden');
+    } else {
+      noGoalsEl.classList.add('hidden');
+      goalsContainer.innerHTML = filteredGoals.map(goal => {
+        const isOverdue = new Date(goal.dueDate) < new Date() && goal.status !== 'completed';
+        const daysUntilDue = Math.ceil((new Date(goal.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+        
+        return `
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 goal-card" data-goal-id="${goal.id}">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                  ${goal.name}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">${goal.subject}</p>
+              </div>
+              
+              <div class="flex items-center space-x-2 ml-4">
+                <button 
+                  class="edit-goal-btn p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  data-id="${goal.id}"
+                  aria-label="Edit goal"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                </button>
+                <button 
+                  class="delete-goal-btn p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                  data-id="${goal.id}"
+                  aria-label="Delete goal"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="mb-4">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+                <span class="text-sm font-semibold text-gray-900 dark:text-white">${goal.progressPct}%</span>
+              </div>
+              <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div 
+                  class="h-2 rounded-full transition-all duration-300 ${getProgressColor(goal.progressPct)}"
+                  style="width: ${goal.progressPct}%"
+                ></div>
+              </div>
+            </div>
+            
+            <!-- Status and Due Date -->
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusClass(goal.status)}">
+                ${goal.status.replace('-', ' ')}
+              </span>
+              
+              ${isOverdue ? 
+                '<span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">Overdue</span>' :
+                (daysUntilDue <= 7 && daysUntilDue > 0) ? 
+                '<span class="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300">Due soon</span>' : 
+                ''
+              }
+            </div>
+            
+            <!-- Due Date -->
+            <div class="flex justify-between items-center text-sm mb-4">
+              <span class="text-gray-600 dark:text-gray-400">
+                Due: ${new Date(goal.dueDate).toLocaleDateString()}
+              </span>
+              <span class="text-gray-500 dark:text-gray-400">
+                ${daysUntilDue > 0 ? `${daysUntilDue} days left` : daysUntilDue === 0 ? 'Due today' : `${Math.abs(daysUntilDue)} days overdue`}
+              </span>
+            </div>
+            
+            <!-- Quick Progress Actions -->
+            ${goal.status === 'active' && goal.progressPct < 100 ? `
+              <div class="flex gap-2">
+                <button 
+                  class="progress-btn flex-1 px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                  data-id="${goal.id}"
+                  data-increment="10"
+                >
+                  +10%
+                </button>
+                <button 
+                  class="progress-btn flex-1 px-3 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
+                  data-id="${goal.id}"
+                  data-increment="25"
+                >
+                  +25%
+                </button>
+                ${goal.progressPct <= 50 ? `
+                  <button 
+                    class="progress-btn flex-1 px-3 py-1 text-xs bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors"
+                    data-id="${goal.id}"
+                    data-increment="50"
+                  >
+                    +50%
+                  </button>
+                ` : ''}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+      
+      // Re-attach event listeners
+      attachCardEventListeners();
+    }
+  }
+  
+  function getProgressColor(progress: number): string {
+    if (progress === 100) return 'bg-green-600';
+    if (progress >= 75) return 'bg-blue-600';
+    if (progress >= 50) return 'bg-yellow-600';
+    return 'bg-red-600';
+  }
+  
+  function getStatusClass(status: GoalStatus): string {
+    const classes = {
+      'active': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+      'completed': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+      'paused': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+      'cancelled': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+    };
+    return classes[status];
+  }
+  
+  function attachCardEventListeners() {
+    // Edit buttons
+    document.querySelectorAll('.edit-goal-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.id!;
+        editGoal(id);
+      });
+    });
+    
+    // Delete buttons
+    document.querySelectorAll('.delete-goal-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.id!;
+        deleteGoalConfirm(id);
+      });
+    });
+    
+    // Progress buttons
+    document.querySelectorAll('.progress-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const id = target.dataset.id!;
+        const increment = parseInt(target.dataset.increment!);
+        updateProgress(id, increment);
+      });
+    });
+  }
+  
+  function showModal(title: string) {
+    modalTitle.textContent = title;
+    modal.classList.remove('hidden');
+    nameInput.focus();
+  }
+  
+  function hideModal() {
+    modal.classList.add('hidden');
+    form.reset();
+    editingId = null;
+  }
+  
+  function editGoal(id: string) {
+    const goal = allGoals.find(g => g.id === id);
+    if (!goal) return;
+    
+    editingId = id;
+    goalIdInput.value = id;
+    nameInput.value = goal.name;
+    subjectInput.value = goal.subject;
+    dueDateInput.value = new Date(goal.dueDate).toISOString().split('T')[0];
+    progressInput.value = goal.progressPct.toString();
+    statusSelect.value = goal.status;
+    
+    showModal('Edit Goal');
+  }
+  
+  function deleteGoalConfirm(id: string) {
+    const goal = allGoals.find(g => g.id === id);
+    if (!goal) return;
+    
+    if (confirm(`Are you sure you want to delete "${goal.name}"?`)) {
+      deleteGoal(id);
+      loadGoals();
+    }
+  }
+  
+  function updateProgress(id: string, increment: number) {
+    const goal = allGoals.find(g => g.id === id);
+    if (!goal) return;
+    
+    const newProgress = Math.min(100, goal.progressPct + increment);
+    const updates: Partial<Goal> = { progressPct: newProgress };
+    
+    // Auto-complete when reaching 100%
+    if (newProgress === 100 && goal.status === 'active') {
+      updates.status = 'completed';
+    }
+    
+    updateGoal(id, updates);
+    loadGoals();
+  }
+  
+  // Event listeners
+  document.getElementById('add-goal-btn')?.addEventListener('click', () => {
+    // Set default due date to one month from now
+    const defaultDate = new Date();
+    defaultDate.setMonth(defaultDate.getMonth() + 1);
+    dueDateInput.value = defaultDate.toISOString().split('T')[0];
+    showModal('Add Goal');
+  });
+  
+  document.querySelector('.add-goal-trigger')?.addEventListener('click', () => {
+    const defaultDate = new Date();
+    defaultDate.setMonth(defaultDate.getMonth() + 1);
+    dueDateInput.value = defaultDate.toISOString().split('T')[0];
+    showModal('Add Goal');
+  });
+  
+  document.getElementById('close-modal')?.addEventListener('click', hideModal);
+  document.getElementById('cancel-btn')?.addEventListener('click', hideModal);
+  
+  // Filter event listeners
+  statusFilter.addEventListener('change', applyFilters);
+  subjectFilter.addEventListener('change', applyFilters);
+  sortSelect.addEventListener('change', applyFilters);
+  
+  // Form submission
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const goalData = {
+      name: nameInput.value,
+      subject: subjectInput.value,
+      dueDate: new Date(dueDateInput.value),
+      progressPct: parseInt(progressInput.value),
+      status: statusSelect.value as GoalStatus
+    };
+    
+    if (editingId) {
+      updateGoal(editingId, goalData);
+    } else {
+      saveGoal(goalData);
+    }
+    
+    hideModal();
+    loadGoals();
+  });
+  
+  // Close modal on outside click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      hideModal();
+    }
+  });
+  
+  // Initialize
+  loadGoals();
+</script>

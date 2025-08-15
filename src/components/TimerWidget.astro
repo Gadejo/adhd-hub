@@ -1,0 +1,260 @@
+---
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+  <div class="text-center">
+    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Study Timer</h2>
+    
+    <div class="mb-8">
+      <div id="timer-display" class="text-6xl font-mono font-bold text-blue-600 dark:text-blue-400 mb-4">
+        00:00:00
+      </div>
+      <div id="timer-status" class="text-sm text-gray-600 dark:text-gray-400">
+        Press Space or click Start to begin
+      </div>
+    </div>
+    
+    <div class="flex justify-center space-x-4 mb-6">
+      <button 
+        id="start-pause-btn"
+        class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+      >
+        Start
+      </button>
+      <button 
+        id="reset-btn"
+        class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors"
+      >
+        Reset
+      </button>
+      <button 
+        id="stop-log-btn"
+        class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled
+      >
+        Stop & Log
+      </button>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="timer-subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Subject (optional)
+        </label>
+        <select 
+          id="timer-subject"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select subject...</option>
+        </select>
+      </div>
+      <div>
+        <label for="timer-resource" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Resource (optional)
+        </label>
+        <select 
+          id="timer-resource"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">Select a resource...</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { saveSession, getAll } from '../lib/storage.js';
+  
+  class Timer {
+    private startTime: number | null = null;
+    private elapsedSeconds: number = 0;
+    private intervalId: number | null = null;
+    private isRunning: boolean = false;
+    private isPaused: boolean = false;
+    
+    private displayElement = document.getElementById('timer-display')!;
+    private statusElement = document.getElementById('timer-status')!;
+    private startPauseBtn = document.getElementById('start-pause-btn')!;
+    private resetBtn = document.getElementById('reset-btn')!;
+    private stopLogBtn = document.getElementById('stop-log-btn')!;
+    
+    constructor() {
+      this.loadFromStorage();
+      this.updateDisplay();
+      this.bindEvents();
+      this.loadSubjects();
+      this.loadResources();
+    }
+    
+    private loadFromStorage() {
+      const stored = localStorage.getItem('timer-state');
+      if (stored) {
+        try {
+          const state = JSON.parse(stored);
+          if (state.isRunning && state.startTime) {
+            this.startTime = state.startTime;
+            this.elapsedSeconds = state.elapsedSeconds || 0;
+            this.isRunning = true;
+            this.startInterval();
+          } else if (state.isPaused) {
+            this.elapsedSeconds = state.elapsedSeconds || 0;
+            this.isPaused = true;
+          }
+        } catch (e) {
+          console.error('Failed to load timer state:', e);
+        }
+      }
+    }
+    
+    private saveToStorage() {
+      const state = {
+        startTime: this.startTime,
+        elapsedSeconds: this.elapsedSeconds,
+        isRunning: this.isRunning,
+        isPaused: this.isPaused
+      };
+      localStorage.setItem('timer-state', JSON.stringify(state));
+    }
+    
+    private bindEvents() {
+      this.startPauseBtn.addEventListener('click', () => this.toggleTimer());
+      this.resetBtn.addEventListener('click', () => this.reset());
+      this.stopLogBtn.addEventListener('click', () => this.stopAndLog());
+      
+      // Global keyboard shortcut
+      window.addEventListener('toggle-timer', () => this.toggleTimer());
+    }
+    
+    private loadSubjects() {
+      const data = getAll();
+      const select = document.getElementById('timer-subject') as HTMLSelectElement;
+      const userSubjects = data.subjects.filter(s => !s.isTemplate);
+      
+      select.innerHTML = '<option value="">Select subject...</option>';
+      userSubjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject.name;
+        option.textContent = subject.name;
+        select.appendChild(option);
+      });
+    }
+    
+    private loadResources() {
+      const data = getAll();
+      const select = document.getElementById('timer-resource') as HTMLSelectElement;
+      
+      select.innerHTML = '<option value="">Select a resource...</option>';
+      data.resources.forEach(resource => {
+        const option = document.createElement('option');
+        option.value = resource.id;
+        option.textContent = resource.title;
+        select.appendChild(option);
+      });
+    }
+    
+    private toggleTimer() {
+      if (this.isRunning) {
+        this.pause();
+      } else {
+        this.start();
+      }
+    }
+    
+    private start() {
+      this.startTime = Date.now() - (this.elapsedSeconds * 1000);
+      this.isRunning = true;
+      this.isPaused = false;
+      this.startInterval();
+      this.updateButtons();
+      this.updateStatus('Timer running...');
+      this.saveToStorage();
+    }
+    
+    private pause() {
+      this.isRunning = false;
+      this.isPaused = true;
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+        this.intervalId = null;
+      }
+      this.updateButtons();
+      this.updateStatus('Timer paused');
+      this.saveToStorage();
+    }
+    
+    private reset() {
+      this.isRunning = false;
+      this.isPaused = false;
+      this.elapsedSeconds = 0;
+      this.startTime = null;
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+        this.intervalId = null;
+      }
+      this.updateDisplay();
+      this.updateButtons();
+      this.updateStatus('Press Space or click Start to begin');
+      localStorage.removeItem('timer-state');
+    }
+    
+    private stopAndLog() {
+      if (this.elapsedSeconds === 0) return;
+      
+      const durationMin = Math.round(this.elapsedSeconds / 60);
+      const subjectSelect = document.getElementById('timer-subject') as HTMLSelectElement;
+      const resourceSelect = document.getElementById('timer-resource') as HTMLSelectElement;
+      
+      const session = {
+        startedAt: new Date(Date.now() - (this.elapsedSeconds * 1000)),
+        durationMin,
+        subject: subjectSelect.value || undefined,
+        resourceId: resourceSelect.value || undefined
+      };
+      
+      saveSession(session);
+      this.reset();
+      
+      alert(`Session logged: ${durationMin} minutes`);
+      
+      // Update stats if on dashboard
+      window.dispatchEvent(new CustomEvent('session-logged'));
+    }
+    
+    private startInterval() {
+      this.intervalId = window.setInterval(() => {
+        if (this.startTime && this.isRunning) {
+          this.elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+          this.updateDisplay();
+          this.saveToStorage();
+        }
+      }, 1000);
+    }
+    
+    private updateDisplay() {
+      const hours = Math.floor(this.elapsedSeconds / 3600);
+      const minutes = Math.floor((this.elapsedSeconds % 3600) / 60);
+      const seconds = this.elapsedSeconds % 60;
+      
+      const display = [hours, minutes, seconds]
+        .map(n => n.toString().padStart(2, '0'))
+        .join(':');
+      
+      this.displayElement.textContent = display;
+    }
+    
+    private updateButtons() {
+      const hasTime = this.elapsedSeconds > 0;
+      
+      this.startPauseBtn.textContent = this.isRunning ? 'Pause' : 'Start';
+      this.stopLogBtn.disabled = !hasTime;
+    }
+    
+    private updateStatus(text: string) {
+      this.statusElement.textContent = text;
+    }
+  }
+  
+  // Initialize timer when page loads
+  new Timer();
+</script>

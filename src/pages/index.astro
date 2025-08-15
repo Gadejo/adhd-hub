@@ -1,0 +1,245 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopBar from '../components/TopBar.astro';
+import TimerWidget from '../components/TimerWidget.astro';
+---
+
+<Layout title="ADHD Hub - Dashboard">
+  <TopBar title="ADHD Hub" />
+  
+  <main class="flex-1 p-4 md:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Dashboard</h1>
+        <p class="text-gray-600 dark:text-gray-400">Track your study sessions and monitor your progress</p>
+      </div>
+      
+      <!-- Subject Selection -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <label for="subject-select" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Current Subject:
+            </label>
+            <select 
+              id="subject-select"
+              class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Subjects</option>
+            </select>
+          </div>
+          <button 
+            id="manage-subjects-btn"
+            class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            Manage Subjects
+          </button>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Timer Widget -->
+        <div class="lg:col-span-2">
+          <TimerWidget />
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="space-y-6">
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Today's Progress</h3>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-600 dark:text-gray-400">Study Time</span>
+                <span id="today-minutes" class="font-semibold text-gray-900 dark:text-white">0 min</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-600 dark:text-gray-400">Sessions</span>
+                <span id="today-sessions" class="font-semibold text-gray-900 dark:text-white">0</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-600 dark:text-gray-400">Current Streak</span>
+                <span id="current-streak" class="font-semibold text-gray-900 dark:text-white">0 days</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+            <div class="space-y-3">
+              <a 
+                href="/resources" 
+                class="block w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-center rounded-lg transition-colors"
+              >
+                Browse Resources
+              </a>
+              <a 
+                href="/goals" 
+                class="block w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-center rounded-lg transition-colors"
+              >
+                View Goals
+              </a>
+              <a 
+                href="/stats" 
+                class="block w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-center rounded-lg transition-colors"
+              >
+                Detailed Stats
+              </a>
+            </div>
+          </div>
+          
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Resources</h3>
+            <div id="recent-resources" class="space-y-2">
+              <p class="text-sm text-gray-500 dark:text-gray-400">No recent resources</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { getAll, updateSettings, updateSubjectStats } from '../lib/storage.js';
+  
+  let selectedSubjectId = '';
+  
+  function loadSubjects() {
+    const data = getAll();
+    const subjectSelect = document.getElementById('subject-select');
+    
+    // Clear existing options except "All Subjects"
+    subjectSelect.innerHTML = '<option value="">All Subjects</option>';
+    
+    // Add user subjects (non-template)
+    const userSubjects = data.subjects.filter(s => !s.isTemplate);
+    userSubjects.forEach(subject => {
+      const option = document.createElement('option');
+      option.value = subject.id;
+      option.textContent = subject.name;
+      subjectSelect.appendChild(option);
+    });
+    
+    // Set selected subject from settings
+    selectedSubjectId = data.settings.selectedSubjectId || '';
+    subjectSelect.value = selectedSubjectId;
+  }
+  
+  function updateStats() {
+    const data = getAll();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Get selected subject
+    const selectedSubject = selectedSubjectId ? 
+      data.subjects.find(s => s.id === selectedSubjectId) : null;
+    
+    // Filter sessions by subject if one is selected
+    let allSessions = data.sessions;
+    if (selectedSubject) {
+      allSessions = data.sessions.filter(s => s.subject === selectedSubject.name);
+    }
+    
+    // Calculate today's stats
+    const todaySessions = allSessions.filter(s => {
+      const sessionDate = new Date(s.startedAt);
+      sessionDate.setHours(0, 0, 0, 0);
+      return sessionDate.getTime() === today.getTime();
+    });
+    
+    const todayMinutes = todaySessions.reduce((sum, s) => sum + s.durationMin, 0);
+    
+    // Calculate streak
+    let streak = 0;
+    const dates = [...new Set(allSessions.map(s => {
+      const date = new Date(s.startedAt);
+      date.setHours(0, 0, 0, 0);
+      return date.getTime();
+    }))].sort((a, b) => b - a);
+    
+    for (let i = 0; i < dates.length; i++) {
+      const expectedDate = today.getTime() - (i * 24 * 60 * 60 * 1000);
+      if (dates[i] === expectedDate) {
+        const dayMinutes = allSessions
+          .filter(s => {
+            const sessionDate = new Date(s.startedAt);
+            sessionDate.setHours(0, 0, 0, 0);
+            return sessionDate.getTime() === dates[i];
+          })
+          .reduce((sum, s) => sum + s.durationMin, 0);
+        
+        if (dayMinutes > 0) {
+          streak++;
+        } else {
+          break;
+        }
+      } else {
+        break;
+      }
+    }
+    
+    // Update display
+    document.getElementById('today-minutes')!.textContent = `${todayMinutes} min`;
+    document.getElementById('today-sessions')!.textContent = todaySessions.length.toString();
+    document.getElementById('current-streak')!.textContent = `${streak} days`;
+    
+    // Update recent resources - filter by subject if one is selected
+    const recentResourcesEl = document.getElementById('recent-resources')!;
+    let filteredResources = data.resources;
+    if (selectedSubject) {
+      filteredResources = data.resources.filter(r => r.subject === selectedSubject.name);
+    }
+    
+    const recentResources = filteredResources
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, 3);
+    
+    if (recentResources.length === 0) {
+      recentResourcesEl.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400">No recent resources</p>';
+    } else {
+      recentResourcesEl.innerHTML = recentResources
+        .map(resource => `
+          <div class="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 dark:text-white truncate">${resource.title}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">${resource.subject}</p>
+            </div>
+            <a 
+              href="${resource.url}" 
+              target="_blank"
+              rel="noopener noreferrer"
+              class="ml-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+            </a>
+          </div>
+        `)
+        .join('');
+    }
+  }
+  
+  // Subject selection event listener
+  document.getElementById('subject-select')?.addEventListener('change', (e) => {
+    selectedSubjectId = (e.target as HTMLSelectElement).value;
+    updateSettings({ selectedSubjectId });
+    updateStats();
+  });
+  
+  // Manage subjects button
+  document.getElementById('manage-subjects-btn')?.addEventListener('click', () => {
+    window.location.href = '/subjects';
+  });
+  
+  // Update stats on page load
+  updateSubjectStats(); // Update stats first
+  loadSubjects();
+  updateStats();
+  
+  // Update stats when a session is logged
+  window.addEventListener('session-logged', () => {
+    updateSubjectStats();
+    updateStats();
+  });
+</script>

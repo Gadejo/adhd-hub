@@ -1,0 +1,56 @@
+---
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="ADHD-friendly learning hub for managing resources, goals, and study sessions" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen transition-colors">
+    <div id="app" class="min-h-screen flex flex-col">
+      <slot />
+    </div>
+    
+    <script>
+      // Initialize theme from localStorage
+      const theme = localStorage.getItem('adhd-hub-data');
+      if (theme) {
+        try {
+          const data = JSON.parse(theme);
+          if (data.settings?.theme === 'light') {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {
+          // Keep default dark theme
+        }
+      }
+      
+      // Global keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        // Space for timer toggle (only when not in input fields)
+        if (e.code === 'Space' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
+          e.preventDefault();
+          window.dispatchEvent(new CustomEvent('toggle-timer'));
+        }
+        
+        // / for search focus (only on resources page)
+        if (e.key === '/' && window.location.pathname === '/resources') {
+          e.preventDefault();
+          const searchInput = document.querySelector('#search-input');
+          if (searchInput) {
+            searchInput.focus();
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
