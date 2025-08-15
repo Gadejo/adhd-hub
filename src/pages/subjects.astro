@@ -23,9 +23,35 @@ import TopBar from '../components/TopBar.astro';
       
       <!-- Templates Section -->
       <div class="mb-8">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Templates</h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-4">Start with a pre-configured subject template</p>
-        <div id="templates-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Subject Templates</h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">Start with a pre-configured subject template - we've added 25+ subjects including Japanese, Chemistry, Programming, and more!</p>
+        
+        <!-- Category Filter -->
+        <div class="flex flex-wrap gap-2 mb-6">
+          <button class="template-filter active px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" data-category="all">
+            All (25+)
+          </button>
+          <button class="template-filter px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600" data-category="stem">
+            STEM
+          </button>
+          <button class="template-filter px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600" data-category="languages">
+            Languages
+          </button>
+          <button class="template-filter px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600" data-category="business">
+            Business
+          </button>
+          <button class="template-filter px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600" data-category="humanities">
+            Humanities
+          </button>
+          <button class="template-filter px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600" data-category="creative">
+            Creative
+          </button>
+          <button class="template-filter px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600" data-category="professional">
+            Professional
+          </button>
+        </div>
+        
+        <div id="templates-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <!-- Templates will be loaded here -->
         </div>
       </div>
@@ -165,10 +191,26 @@ import TopBar from '../components/TopBar.astro';
     renderSubjects();
   }
   
+  // Define subject categories
+  const subjectCategories = {
+    stem: ['template-mathematics', 'template-statistics', 'template-chemistry', 'template-physics', 'template-biology', 'template-programming', 'template-web-development', 'template-computer-science'],
+    languages: ['template-japanese', 'template-english', 'template-spanish', 'template-french'],
+    business: ['template-business', 'template-economics', 'template-finance', 'template-project-management', 'template-digital-marketing'],
+    humanities: ['template-history', 'template-psychology', 'template-philosophy'],
+    creative: ['template-art', 'template-music', 'template-cooking', 'template-photography'],
+    professional: ['template-project-management', 'template-digital-marketing', 'template-health-fitness']
+  };
+
+  let currentCategory = 'all';
+
   function renderTemplates() {
     const templates = allSubjects.filter(s => s.isTemplate);
-    templatesGrid.innerHTML = templates.map(template => `
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4">
+    const filteredTemplates = currentCategory === 'all' 
+      ? templates 
+      : templates.filter(t => subjectCategories[currentCategory]?.includes(t.id));
+    
+    templatesGrid.innerHTML = filteredTemplates.map(template => `
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 hover:shadow-lg transition-shadow">
         <div class="flex items-center mb-3">
           <div 
             class="w-4 h-4 rounded-full mr-3" 
@@ -176,7 +218,7 @@ import TopBar from '../components/TopBar.astro';
           ></div>
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">${template.name}</h3>
         </div>
-        ${template.description ? `<p class="text-sm text-gray-600 dark:text-gray-400 mb-4">${template.description}</p>` : ''}
+        ${template.description ? `<p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">${template.description}</p>` : ''}
         <button 
           class="use-template-btn w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
           data-template-id="${template.id}"
@@ -193,6 +235,24 @@ import TopBar from '../components/TopBar.astro';
         createFromTemplate(templateId);
       });
     });
+  }
+
+  function updateCategoryFilter(category: string) {
+    currentCategory = category;
+    
+    // Update active state
+    document.querySelectorAll('.template-filter').forEach(btn => {
+      btn.classList.remove('active', 'bg-blue-100', 'text-blue-800', 'dark:bg-blue-900', 'dark:text-blue-200');
+      btn.classList.add('bg-gray-100', 'text-gray-700', 'dark:bg-gray-700', 'dark:text-gray-300');
+    });
+    
+    const activeBtn = document.querySelector(`[data-category="${category}"]`);
+    if (activeBtn) {
+      activeBtn.classList.remove('bg-gray-100', 'text-gray-700', 'dark:bg-gray-700', 'dark:text-gray-300');
+      activeBtn.classList.add('active', 'bg-blue-100', 'text-blue-800', 'dark:bg-blue-900', 'dark:text-blue-200');
+    }
+    
+    renderTemplates();
   }
   
   function renderSubjects() {
@@ -378,6 +438,14 @@ import TopBar from '../components/TopBar.astro';
     if (e.target === modal) {
       hideModal();
     }
+  });
+
+  // Category filter listeners
+  document.querySelectorAll('.template-filter').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const category = (e.currentTarget as HTMLElement).dataset.category!;
+      updateCategoryFilter(category);
+    });
   });
   
   // Initialize

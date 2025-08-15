@@ -13,10 +13,11 @@ const defaultSettings: Settings = {
 };
 
 const defaultSubjectTemplates: Subject[] = [
+  // Mathematics & Logic
   {
-    id: 'template-math',
+    id: 'template-mathematics',
     name: 'Mathematics',
-    description: 'Algebra, Calculus, Statistics, and other math topics',
+    description: 'Algebra, Calculus, Geometry, Statistics, Number Theory',
     color: '#3B82F6',
     isTemplate: true,
     stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
@@ -24,9 +25,31 @@ const defaultSubjectTemplates: Subject[] = [
     updatedAt: new Date()
   },
   {
-    id: 'template-science',
-    name: 'Science',
-    description: 'Physics, Chemistry, Biology, and other sciences',
+    id: 'template-statistics',
+    name: 'Statistics & Data Analysis',
+    description: 'Probability, Statistical Analysis, Data Science, R, Python',
+    color: '#1E40AF',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // Sciences
+  {
+    id: 'template-chemistry',
+    name: 'Chemistry',
+    description: 'Organic Chemistry, Inorganic Chemistry, Physical Chemistry, Biochemistry',
+    color: '#059669',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'template-physics',
+    name: 'Physics',
+    description: 'Classical Mechanics, Quantum Physics, Thermodynamics, Electromagnetism',
     color: '#10B981',
     isTemplate: true,
     stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
@@ -34,29 +57,31 @@ const defaultSubjectTemplates: Subject[] = [
     updatedAt: new Date()
   },
   {
-    id: 'template-language',
-    name: 'Language Arts',
-    description: 'Literature, Writing, Reading, and language studies',
-    color: '#8B5CF6',
+    id: 'template-biology',
+    name: 'Biology',
+    description: 'Cell Biology, Genetics, Ecology, Molecular Biology, Anatomy',
+    color: '#16A34A',
     isTemplate: true,
     stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
     createdAt: new Date(),
     updatedAt: new Date()
   },
-  {
-    id: 'template-history',
-    name: 'History',
-    description: 'World History, Geography, Social Studies',
-    color: '#F59E0B',
-    isTemplate: true,
-    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
+
+  // Programming & Technology
   {
     id: 'template-programming',
     name: 'Programming',
-    description: 'Software Development, Web Development, Data Science',
+    description: 'Software Development, Algorithms, Data Structures, Design Patterns',
+    color: '#DC2626',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'template-web-development',
+    name: 'Web Development',
+    description: 'HTML, CSS, JavaScript, React, Node.js, Full-Stack Development',
     color: '#EF4444',
     isTemplate: true,
     stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
@@ -64,10 +89,194 @@ const defaultSubjectTemplates: Subject[] = [
     updatedAt: new Date()
   },
   {
+    id: 'template-computer-science',
+    name: 'Computer Science',
+    description: 'Algorithms, Data Structures, Operating Systems, Computer Networks',
+    color: '#B91C1C',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // Languages
+  {
+    id: 'template-japanese',
+    name: 'Japanese',
+    description: 'Hiragana, Katakana, Kanji, Grammar, Conversation, JLPT Preparation',
+    color: '#DC143C',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'template-english',
+    name: 'English',
+    description: 'Grammar, Literature, Writing, Reading Comprehension, Vocabulary',
+    color: '#7C3AED',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'template-spanish',
+    name: 'Spanish',
+    description: 'Grammar, Conversation, Vocabulary, Culture, DELE Preparation',
+    color: '#8B5CF6',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'template-french',
+    name: 'French',
+    description: 'Grammar, Pronunciation, Literature, Conversation, DELF/DALF',
+    color: '#9333EA',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // Business & Economics
+  {
     id: 'template-business',
-    name: 'Business',
-    description: 'Economics, Finance, Management, Marketing',
+    name: 'Business Administration',
+    description: 'Management, Strategy, Operations, Leadership, Entrepreneurship',
+    color: '#0891B2',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'template-economics',
+    name: 'Economics',
+    description: 'Microeconomics, Macroeconomics, Econometrics, Financial Markets',
     color: '#06B6D4',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'template-finance',
+    name: 'Finance',
+    description: 'Corporate Finance, Investment Analysis, Financial Modeling, Trading',
+    color: '#0EA5E9',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // Social Sciences & Humanities
+  {
+    id: 'template-history',
+    name: 'History',
+    description: 'World History, Ancient Civilizations, Modern History, Historical Analysis',
+    color: '#D97706',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'template-psychology',
+    name: 'Psychology',
+    description: 'Cognitive Psychology, Social Psychology, Developmental Psychology, Research Methods',
+    color: '#F59E0B',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'template-philosophy',
+    name: 'Philosophy',
+    description: 'Ethics, Logic, Metaphysics, Political Philosophy, History of Philosophy',
+    color: '#EAB308',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // Creative & Arts
+  {
+    id: 'template-art',
+    name: 'Art & Design',
+    description: 'Drawing, Painting, Digital Art, Graphic Design, Art History',
+    color: '#EC4899',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'template-music',
+    name: 'Music',
+    description: 'Music Theory, Instrument Practice, Composition, Music History',
+    color: '#F472B6',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // Professional Skills
+  {
+    id: 'template-project-management',
+    name: 'Project Management',
+    description: 'Agile, Scrum, Risk Management, Planning, Team Leadership',
+    color: '#64748B',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'template-digital-marketing',
+    name: 'Digital Marketing',
+    description: 'SEO, Social Media, Content Marketing, Analytics, PPC Advertising',
+    color: '#475569',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // Health & Fitness
+  {
+    id: 'template-health-fitness',
+    name: 'Health & Fitness',
+    description: 'Exercise Science, Nutrition, Wellness, Sports Medicine, Personal Training',
+    color: '#16A34A',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+
+  // Other Popular Subjects
+  {
+    id: 'template-cooking',
+    name: 'Cooking & Culinary Arts',
+    description: 'Cooking Techniques, Baking, International Cuisine, Food Science',
+    color: '#F97316',
+    isTemplate: true,
+    stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: 'template-photography',
+    name: 'Photography',
+    description: 'Camera Techniques, Composition, Post-Processing, Studio Lighting',
+    color: '#84CC16',
     isTemplate: true,
     stats: { totalStudyTime: 0, totalResources: 0, completedResources: 0, totalGoals: 0, completedGoals: 0 },
     createdAt: new Date(),
