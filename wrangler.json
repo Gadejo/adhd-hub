@@ -1,0 +1,12 @@
+{
+  "deploymentConfig": {
+    "production": {
+      "command": "npm run build",
+      "destination": "dist"
+    },
+    "preview": {
+      "command": "npm run build",
+      "destination": "dist"
+    }
+  }
+}
